@@ -2,6 +2,8 @@ from math import atan, pi, tan
 from array import array
 from bisect import bisect_left
 from collections import namedtuple
+import importlib.resources as pkg_resources
+from pathlib import Path
 
 Rconj = 15000
 
@@ -9,16 +11,27 @@ Semaphore_t = namedtuple("Semaphore", ["coord", "name"])
 Station_t = namedtuple("Station", ["coord", "length", "name"])
 
 
+def get_track_path(filename: str) -> Path:
+    """Получить путь к изображению из пакета"""
+    try:
+        return str(pkg_resources.files("track_profile.data") / filename)
+    except AttributeError:
+        with pkg_resources.path("track_profile.data", filename) as path:
+            return str(Path(path))
+    except:
+        return filename
+
+
 PATHS = {
-    "MSK_BOLOGOE": "track_profile/data/msk_bologoe.txt",
-    "BOLOGOE_OSTASHKOV": "track_profile/data/bologoe_ostashkov.txt",
-    "slope1": "track_profile/data/ex1.txt",
-    "slope2": "track_profile/data/ex2.txt",
-    "slope3": "track_profile/data/ex3.txt",
-    "slope4": "track_profile/data/ex4.txt",
-    "slope5": "track_profile/data/ex5.txt",
-    "slope6": "track_profile/data/ex6.txt",
-    "slope7": "track_profile/data/ex7.txt",
+    "MSK_BOLOGOE": get_track_path("msk_bologoe.txt"),
+    "BOLOGOE_OSTASHKOV": get_track_path("bologoe_ostashkov.txt"),
+    "slope1": get_track_path("ex1.txt"),
+    "slope2": get_track_path("ex2.txt"),
+    "slope3": get_track_path("ex3.txt"),
+    "slope4": get_track_path("ex4.txt"),
+    "slope5": get_track_path("ex5.txt"),
+    "slope6": get_track_path("ex6.txt"),
+    "slope7": get_track_path("ex7.txt"),
 }
 
 
