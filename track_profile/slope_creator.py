@@ -6,6 +6,7 @@ import importlib.resources as pkg_resources
 from pathlib import Path
 
 Rconj = 15000
+BASE_LENGTH = 10000
 
 Semaphore_t = namedtuple("Semaphore", ["coord", "name"])
 Station_t = namedtuple("Station", ["coord", "length", "name"])
@@ -89,8 +90,17 @@ class SlopeCreator:
         self.__slope_name = slope_name
         self.__reverse = reverse
         self.__cyclic = cyclic
+        try:
+            try:
+                slope_val = float(slope_name)
 
-        result = decode_slope_file(PATHS[slope_name])
+                slopes = [(BASE_LENGTH, slope_val)]
+                semaphores = [Semaphore_t(coord=i, name=f"Н{i // 2000}") for i in range(2000, BASE_LENGTH, 2000)]
+                result = [(BASE_LENGTH, slope_val)], semaphores, [], []
+            except:
+                result = decode_slope_file(PATHS[slope_name])
+        except:
+            result = None
 
         if result:
             slopes, self.semaphores, self.stations, self.four_digit_blocking = result
@@ -99,16 +109,26 @@ class SlopeCreator:
             self.__coords, self.__slopes, self.__conj, self.__radiuses = self.__add_conjugation(slopes)
             self.__coords = self.__cumulative_coords(self.__coords)
             self.__absolute_heights = self.__form_absolute_heights(self.__coords)
+
+            if reverse:
+                for i, st in enumerate(self.stations):
+                    self.stations[i] = Station_t(coord=len(self) - st.coord - st.length, length=st.length, name=st.name)
+                for i, sem in enumerate(self.semaphores):
+                    self.semaphores[i] = Semaphore_t(coord=sem.coord, name=sem.name)
         else:
             self.__coords = [0]
             self.__slopes = [0]
             self.__conj = [0]
-            self.__absolute_heights = [[0, 0], [0, 0]]
+            self.__absolute_heights = [[0, BASE_LENGTH], [0, 0]]
             self.semaphores = None
             self.stations = None
 
     def __len__(self):
-        return self.__coords[-1]
+        res = self.__coords[-1]
+        if res == 0:
+            return 10000
+        else:
+            return res
 
     @property
     def cyclic(self):

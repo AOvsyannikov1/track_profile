@@ -7,7 +7,7 @@ def readme():
 
 setup(
     name="track_profile",
-    version="1.0.0",
+    version="1.1.0",
     packages=find_packages(),
     long_description=readme(),
     package_data={
